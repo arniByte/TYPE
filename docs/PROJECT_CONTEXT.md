@@ -88,6 +88,10 @@ service-role key to the client.
 - `0003_harden_grants_and_storage.sql` — revoke anon RPC execute; lock trigger fns;
   drop broad avatars list policy (from advisors).
 - `0004_add_audio_message_type.sql` — `audio` message type for voice messages.
+- `0005_perf.sql` — perf: RLS `(select auth.uid())` init-plan fix on all 9
+  policies, covering indexes for the 5 FKs, dropped unused
+  `conversations_last_msg_idx`, `REPLICA IDENTITY DEFAULT` on messages +
+  conversation_members. (Server also seeds the sidebar + first message page now.)
 
 ## 9. Manual Supabase dashboard config still required (cannot be done via SQL/MCP)
 1. **Turn OFF "Confirm email"** (Authentication → Providers → Email) — needed for
