@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Mascot } from './Mascot';
+import { BunnyMark } from './Bunny';
 
 type LogoProps = {
-  /** "full" = mascot + wordmark, "word" = wordmark only, "mark" = mascot only */
+  /** "full" = bunny + wordmark, "word" = wordmark only, "mark" = bunny only */
   variant?: 'full' | 'word' | 'mark';
   size?: 'sm' | 'md' | 'lg';
   href?: string | null;
@@ -16,19 +16,14 @@ const WORD_SIZES = {
   lg: 'text-4xl',
 } as const;
 
-const MARK_SIZES = { sm: 22, md: 30, lg: 44 } as const;
+const MARK_SIZES = { sm: 22, md: 28, lg: 40 } as const;
 
 export function Logo({ variant = 'full', size = 'md', href = '/', className }: LogoProps) {
   const content = (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
-      {variant !== 'word' && <Mascot size={MARK_SIZES[size]} look="up" />}
+    <span className={cn('inline-flex items-center gap-2', className)}>
+      {variant !== 'word' && <BunnyMark size={MARK_SIZES[size]} className="text-fg" />}
       {variant !== 'mark' && (
-        <span
-          className={cn(
-            'font-extrabold tracking-tight leading-none text-fg',
-            WORD_SIZES[size],
-          )}
-        >
+        <span className={cn('font-extrabold tracking-tight leading-none text-fg', WORD_SIZES[size])}>
           TYPE
         </span>
       )}

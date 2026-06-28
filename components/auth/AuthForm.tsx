@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, User, AlertCircle, MailCheck } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, MailCheck, AtSign } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input, Label } from '@/components/ui/Input';
@@ -29,6 +29,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(initialError);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -47,19 +48,31 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         router.push(next);
         router.refresh();
       } else {
+        const handle = username.trim().toLowerCase();
+        if (!/^[a-z0-9_]{2,24}$/.test(handle)) {
+          throw new Error('Username must be 2–24 chars: lowercase letters, numbers or _');
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { full_name: name || undefined },
+            data: { full_name: name || undefined, username: handle },
             emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
           },
         });
         if (error) throw error;
-        // If email confirmation is on, there's no session yet.
+        // If email confirmation is on, there's no session yet — the chosen
+        // handle is stored in metadata and claimed by ensure_profile on confirm.
         if (!data.session) {
           setEmailSent(true);
         } else {
+          // Best-effort claim of the chosen handle right away (works whether or
+          // not the profile row already exists).
+          if (data.user) {
+            await supabase
+              .from('profiles')
+              .upsert({ id: data.user.id, username: handle }, { onConflict: 'id' });
+          }
           router.push(next);
           router.refresh();
         }
@@ -89,7 +102,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   if (emailSent) {
     return (
       <div className="animate-fade-in text-center">
-        <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-lime/15 text-lime">
+        <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-lime/20 text-lime-deep">
           <MailCheck className="h-7 w-7" />
         </div>
         <h2 className="text-xl font-bold">Check your inbox</h2>
@@ -97,7 +110,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
           We sent a confirmation link to <span className="text-fg">{email}</span>. Click it to finish
           creating your account.
         </p>
-        <Link href="/login" className="mt-6 inline-block text-sm text-lime hover:underline">
+        <Link href="/login" className="mt-6 inline-block text-sm text-lime-deep hover:underline">
           Back to sign in
         </Link>
       </div>
@@ -133,17 +146,35 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
       <form onSubmit={handleEmail} className="space-y-3.5">
         {mode === 'signup' && (
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              icon={<User className="h-4 w-4" />}
-              placeholder="Ada Lovelace"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
-            />
-          </div>
+          <>
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                icon={<User className="h-4 w-4" />}
+                placeholder="Ada Lovelace"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                required
+                icon={<AtSign className="h-4 w-4" />}
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                autoComplete="off"
+                maxLength={24}
+              />
+              <p className="mt-1 px-1 text-xs text-faint">
+                People will find you as <span className="text-fg">@{username || 'username'}</span>
+              </p>
+            </div>
+          </>
         )}
         <div>
           <Label htmlFor="email">Email</Label>
@@ -181,14 +212,14 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         {mode === 'login' ? (
           <>
             New to TYPE?{' '}
-            <Link href="/signup" className="text-lime hover:underline">
+            <Link href="/signup" className="text-lime-deep hover:underline">
               Create an account
             </Link>
           </>
         ) : (
           <>
             Already have an account?{' '}
-            <Link href="/login" className="text-lime hover:underline">
+            <Link href="/login" className="text-lime-deep hover:underline">
               Sign in
             </Link>
           </>

@@ -46,9 +46,9 @@ export function MediaMessage({
         href={url ?? undefined}
         target="_blank"
         rel="noreferrer"
-        className="flex items-center gap-3 rounded-xl bg-black/20 p-2.5 pr-4 transition-colors hover:bg-black/30"
+        className="flex items-center gap-3 rounded-xl border border-line bg-elevated p-2.5 pr-4 transition-colors hover:bg-hover"
       >
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-lime/15 text-lime">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-lime/20 text-lime-deep">
           <FileText className="h-5 w-5" />
         </span>
         <span className="min-w-0">
@@ -64,7 +64,7 @@ export function MediaMessage({
 
   return (
     <div
-      className="relative overflow-hidden rounded-xl bg-black/30"
+      className="relative overflow-hidden rounded-xl bg-elevated"
       style={{ ...style, maxWidth: '100%' }}
     >
       {!url && !errored && (

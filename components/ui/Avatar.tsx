@@ -33,7 +33,7 @@ export function Avatar({ src, name, size = 'md', group, online, className }: Ava
         className={cn(
           'grid place-items-center overflow-hidden rounded-full font-semibold ring-1 ring-line',
           SIZES[size],
-          !src && (group ? 'bg-lime/15 text-lime' : tintFor(name ?? '?')),
+          !src && (group ? 'bg-lime/20 text-lime-deep' : tintFor(name ?? '?')),
         )}
       >
         {src ? (

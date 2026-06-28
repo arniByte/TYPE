@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mascot } from '@/components/brand/Mascot';
+import { BunnyAscii } from '@/components/brand/Bunny';
 import { Logo } from '@/components/brand/Logo';
 
 export function AuthShell({
@@ -15,19 +15,15 @@ export function AuthShell({
     <div className="grid min-h-dvh lg:grid-cols-2">
       {/* Brand panel (desktop) */}
       <aside className="relative hidden overflow-hidden border-r border-line bg-surface lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="dot-grid absolute inset-0 opacity-60" />
-        <div className="aura absolute inset-0" />
+        <div className="dot-grid absolute inset-0 opacity-70" />
         <div className="relative">
           <Logo size="md" />
         </div>
-        <div className="relative">
-          <Mascot size={84} className="mb-8" />
-          <h1 className="max-w-sm text-5xl font-extrabold leading-[1.05] tracking-tight">
-            Where <span className="mark">words</span> matter.
-          </h1>
-          <p className="mt-5 max-w-sm text-pretty text-muted">
-            A calmer messenger. Add people, talk in real time, share photos and video, and start
-            groups — all in one clean, fast place.
+        <div className="relative flex flex-col items-start">
+          <BunnyAscii sizeClass="text-2xl sm:text-3xl" className="mb-6" />
+          <h1 className="font-display text-7xl leading-none text-fg">TYPE</h1>
+          <p className="mt-3 text-lg font-medium text-fg">
+            where <span className="mark">words</span> matter
           </p>
         </div>
         <p className="relative text-xs text-faint">Minimal by design. Yours by default.</p>
