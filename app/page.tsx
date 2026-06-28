@@ -47,7 +47,7 @@ export default async function LandingPage() {
         <PlayableBunny sizeClass="text-2xl sm:text-5xl" className="mb-4 sm:mb-8" />
 
         <h1 className="pb-1">
-          <TypeWordmark loop={false} className="text-[3.25rem] leading-none sm:text-[7rem]" />
+          <TypeWordmark loop={false} className="text-[3.5rem] sm:text-[7.5rem]" />
         </h1>
 
         <p className="mb-6 mt-2 text-base font-medium text-muted sm:mb-8 sm:text-xl">

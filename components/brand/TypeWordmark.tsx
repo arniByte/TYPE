@@ -1,35 +1,21 @@
 import { cn } from '@/lib/utils';
 
-const LETTERS = ['T', 'Y', 'P', 'E'];
-
 /**
- * The "TYPE" wordmark that types itself out on a gentle loop (with a blinking
- * caret) — a nod to the product. Pure CSS, so it works in server components.
- * Falls back to a static word under prefers-reduced-motion.
+ * The calligraphic "TYPE" wordmark that draws itself in, left to right, as if
+ * being written by hand. Pure CSS (clip-path reveal), so it works in server
+ * components and is disabled under prefers-reduced-motion.
+ *
+ * loop = keeps re-writing (menu/sidebar); false = writes once and stays (hero).
  */
-export function TypeWordmark({
-  className,
-  loop = true,
-}: {
-  className?: string;
-  /** loop = keeps re-typing (menu); false = types once and stays (hero). */
-  loop?: boolean;
-}) {
-  const letterClass = loop ? 'tw-letter' : 'tw-letter-once';
-  const step = loop ? 0.16 : 0.09;
+export function TypeWordmark({ className, loop = true }: { className?: string; loop?: boolean }) {
   return (
     <span
-      className={cn('inline-flex items-center font-extrabold tracking-tight text-fg', className)}
+      className={cn('relative inline-block font-display leading-[1.15] text-fg', className)}
       role="img"
       aria-label="TYPE"
     >
-      {LETTERS.map((c, i) => (
-        <span key={i} className={letterClass} style={{ animationDelay: `${i * step}s` }} aria-hidden>
-          {c}
-        </span>
-      ))}
-      <span className="tw-caret text-lime-deep" aria-hidden>
-        |
+      <span className={cn('inline-block', loop ? 'tw-write-loop' : 'tw-write-once')} aria-hidden>
+        TYPE
       </span>
     </span>
   );

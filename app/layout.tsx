@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Pacifico } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -11,6 +11,13 @@ const inter = Inter({
 const mono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const display = Pacifico({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -46,7 +53,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${mono.variable} ${display.variable}`}>
       <body className="min-h-dvh bg-canvas font-sans text-fg">{children}</body>
     </html>
   );
