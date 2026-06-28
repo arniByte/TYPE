@@ -9,7 +9,7 @@ import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { Composer, type ReplyTarget } from './Composer';
 import { ConversationInfoModal, type Member } from './ConversationInfoModal';
-import type { Conversation, MemberRole, Profile } from '@/lib/types/database';
+import type { Conversation, MemberRole, Message, Profile } from '@/lib/types/database';
 
 type MemberRow = {
   user_id: string;
@@ -22,9 +22,11 @@ type MemberRow = {
 export function ChatView({
   conversation,
   initialMembers,
+  initialMessages = [],
 }: {
   conversation: Conversation;
   initialMembers: Member[];
+  initialMessages?: Message[];
 }) {
   const { supabase, me, isOnline } = useApp();
   const isGroup = conversation.type === 'group';
@@ -35,7 +37,7 @@ export function ChatView({
   const [scrollToken, setScrollToken] = useState(0);
 
   const { messages, initialLoaded, hasMore, loadingOlder, loadOlder, addPending, markFailed } =
-    useRealtimeMessages(conversation.id);
+    useRealtimeMessages(conversation.id, initialMessages);
   const { typing, notifyTyping, notifyStop } = useTyping(conversation.id);
 
   const profiles = useMemo(() => {
