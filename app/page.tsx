@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Logo } from '@/components/brand/Logo';
-import { BunnyAscii } from '@/components/brand/Bunny';
+import { TypeWordmark } from '@/components/brand/TypeWordmark';
+import { PlayableBunny } from '@/components/game/PlayableBunny';
 import { Button } from '@/components/ui/Button';
 import { QuickAuth } from '@/components/auth/QuickAuth';
 
@@ -18,7 +19,7 @@ export default async function LandingPage() {
 
       {/* Nav */}
       <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-5">
-        <Logo size="md" href="/" />
+        <Logo size="md" href="/" animated />
         <nav className="flex items-center gap-2">
           {user ? (
             <Link href="/app">
@@ -43,9 +44,11 @@ export default async function LandingPage() {
 
       {/* Hero */}
       <main className="relative flex flex-1 flex-col items-center justify-center px-5 pb-12 pt-2 text-center">
-        <BunnyAscii sizeClass="text-2xl sm:text-5xl" className="mb-4 sm:mb-8" />
+        <PlayableBunny sizeClass="text-2xl sm:text-5xl" className="mb-4 sm:mb-8" />
 
-        <h1 className="font-display text-fg text-[3rem] leading-[1.1] pb-1 sm:text-[7rem]">TYPE</h1>
+        <h1 className="pb-1">
+          <TypeWordmark loop={false} className="text-[3.25rem] leading-none sm:text-[7rem]" />
+        </h1>
 
         <p className="mb-6 mt-2 text-base font-medium text-muted sm:mb-8 sm:text-xl">
           where <span className="mark">words</span> matter
