@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 export function TypeWordmark({ className, loop = true }: { className?: string; loop?: boolean }) {
   return (
     <span
-      className={cn('relative inline-block font-display leading-[1.15] text-fg', className)}
+      className={cn('relative inline-block font-display leading-[1.15] pb-[0.3em] pt-[0.12em] text-fg', className)}
       role="img"
       aria-label="TYPE"
     >
