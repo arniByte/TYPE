@@ -101,42 +101,44 @@
     );
   }
 
-  /* Calligraphic wordmark that draws itself in, left to right. */
+  /* Calligraphic wordmark that draws itself in, left to right. The negative
+     top/bottom/left/right insets give the script's swashes and descenders room
+     so they are never clipped — only the right edge animates for the reveal. */
   .tw-write-loop {
-    animation: tw-write-loop 5s ease-in-out infinite;
+    animation: tw-write-loop 7s ease-in-out infinite;
   }
   .tw-write-once {
-    animation: tw-write-once 1.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+    animation: tw-write-once 1.6s cubic-bezier(0.65, 0, 0.35, 1) both;
   }
 }
 
 @keyframes tw-write-once {
   from {
-    clip-path: inset(0 100% 0 0);
+    clip-path: inset(-45% 100% -65% -10%);
   }
   to {
-    clip-path: inset(0 0 0 0);
+    clip-path: inset(-45% -10% -65% -10%);
   }
 }
 @keyframes tw-write-loop {
   0% {
-    clip-path: inset(0 100% 0 0);
+    clip-path: inset(-45% 100% -65% -10%);
     opacity: 1;
   }
-  30% {
-    clip-path: inset(0 0 0 0);
+  22% {
+    clip-path: inset(-45% -10% -65% -10%);
     opacity: 1;
   }
-  82% {
-    clip-path: inset(0 0 0 0);
+  86% {
+    clip-path: inset(-45% -10% -65% -10%);
     opacity: 1;
   }
-  92% {
-    clip-path: inset(0 0 0 0);
+  93% {
+    clip-path: inset(-45% -10% -65% -10%);
     opacity: 0;
   }
   100% {
-    clip-path: inset(0 100% 0 0);
+    clip-path: inset(-45% 100% -65% -10%);
     opacity: 0;
   }
 }
