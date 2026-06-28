@@ -25,7 +25,9 @@ function DaySeparator({ iso }: { iso: string }) {
 function SystemMessage({ text }: { text: string }) {
   return (
     <div className="my-2 flex justify-center">
-      <span className="rounded-full bg-elevated/60 px-3 py-1 text-center text-xs text-muted">{text}</span>
+      <span className="rounded-full border border-line bg-surface px-3 py-1 text-center text-xs text-muted">
+        {text}
+      </span>
     </div>
   );
 }

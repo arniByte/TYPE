@@ -171,7 +171,7 @@ export function MessageBubble({
             <div
               className={cn(
                 'mt-0.5 flex items-center justify-end gap-1 text-[10px]',
-                isOwn ? 'text-lime-ink/60' : 'text-faint',
+                isOwn ? 'text-lime-ink/75' : 'text-faint',
                 isMedia && message.content ? 'px-1.5 pb-0.5' : isMedia ? 'px-1.5 pb-0.5' : '',
               )}
             >

@@ -21,8 +21,8 @@ export function AuthShell({
         </div>
         <div className="relative flex flex-col items-start">
           <BunnyAscii sizeClass="text-2xl sm:text-3xl" className="mb-6" />
-          <h1 className="font-display text-7xl leading-none text-fg">TYPE</h1>
-          <p className="mt-3 text-lg font-medium text-fg">
+          <h1 className="font-display text-7xl leading-tight text-fg">TYPE</h1>
+          <p className="mt-4 text-lg font-medium text-fg">
             where <span className="mark">words</span> matter
           </p>
         </div>

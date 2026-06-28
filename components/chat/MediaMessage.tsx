@@ -106,7 +106,7 @@ export function MediaMessage({
         </video>
       )}
       {!url && type === 'video' && (
-        <div className="absolute bottom-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-black/50">
+        <div className="absolute bottom-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white">
           <Play className="h-4 w-4" />
         </div>
       )}

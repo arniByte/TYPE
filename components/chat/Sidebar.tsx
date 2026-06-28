@@ -82,7 +82,6 @@ export function Sidebar() {
           placeholder="Search conversations"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="h-10 bg-canvas"
         />
       </div>
 

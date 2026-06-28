@@ -43,8 +43,8 @@ export function Modal({ open, onClose, title, description, children, className, 
         aria-modal="true"
         aria-label={title}
         className={cn(
-          'relative z-10 m-0 w-full max-w-md animate-scale-in border border-line bg-surface shadow-pop',
-          'rounded-t-4xl sm:m-4 sm:rounded-4xl',
+          'relative z-10 m-0 w-full max-w-md animate-scale-in border border-line bg-surface shadow-pop pb-safe',
+          'rounded-t-4xl sm:m-4 sm:rounded-4xl sm:pb-0',
           className,
         )}
       >

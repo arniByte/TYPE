@@ -13,7 +13,7 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'bg-lime text-lime-ink font-semibold hover:bg-lime-bright active:bg-lime-deep shadow-glow-sm',
+    'bg-lime text-lime-ink font-semibold hover:bg-lime-bright active:brightness-95 shadow-glow-sm',
   secondary:
     'bg-elevated text-fg hover:bg-hover border border-line',
   outline:
