@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Logo } from '@/components/brand/Logo';
 import { BunnyAscii } from '@/components/brand/Bunny';
 import { Button } from '@/components/ui/Button';
+import { QuickAuth } from '@/components/auth/QuickAuth';
 
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -41,30 +42,24 @@ export default async function LandingPage() {
       </header>
 
       {/* Hero */}
-      <main className="relative flex flex-1 flex-col items-center justify-center px-5 pb-24 text-center">
-        <BunnyAscii sizeClass="text-3xl sm:text-5xl" className="mb-8 sm:mb-10" />
+      <main className="relative flex flex-1 flex-col items-center justify-center px-5 pb-12 pt-2 text-center">
+        <BunnyAscii sizeClass="text-2xl sm:text-5xl" className="mb-4 sm:mb-8" />
 
-        <h1 className="font-display text-fg text-[3.5rem] leading-[1.1] pb-2 sm:text-[8rem]">TYPE</h1>
+        <h1 className="font-display text-fg text-[3rem] leading-[1.1] pb-1 sm:text-[7rem]">TYPE</h1>
 
-        <p className="mt-6 text-xl font-medium sm:text-2xl">
+        <p className="mb-6 mt-2 text-base font-medium text-muted sm:mb-8 sm:text-xl">
           where <span className="mark">words</span> matter
         </p>
 
-        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-          <Link href={user ? '/app' : '/signup'}>
+        {user ? (
+          <Link href="/app">
             <Button size="lg" className="px-8">
-              {user ? 'Open TYPE' : 'Start typing — it’s free'}
-              <ArrowRight className="h-4 w-4" />
+              Open TYPE <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          {!user && (
-            <Link href="/login">
-              <Button variant="outline" size="lg" className="px-8">
-                I already have an account
-              </Button>
-            </Link>
-          )}
-        </div>
+        ) : (
+          <QuickAuth />
+        )}
       </main>
 
       {/* Footer */}

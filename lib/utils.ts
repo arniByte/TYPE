@@ -32,6 +32,17 @@ export function initials(name: string | null | undefined): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/** Short human label for a non-text message type. */
+export function mediaLabel(type: string): string {
+  return type === 'image'
+    ? 'Photo'
+    : type === 'video'
+      ? 'Video'
+      : type === 'audio'
+        ? 'Voice message'
+        : 'File';
+}
+
 /** Format a byte count as a short human string. */
 export function formatBytes(bytes: number): string {
   if (!bytes) return '0 B';

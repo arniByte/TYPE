@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Image as ImageIcon, Video, Paperclip, Check } from 'lucide-react';
+import { Image as ImageIcon, Video, Paperclip, Mic, Check } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ export function conversationTitle(c: ConversationOverview): string {
 function previewIcon(type: string) {
   if (type === 'image') return <ImageIcon className="h-3.5 w-3.5" />;
   if (type === 'video') return <Video className="h-3.5 w-3.5" />;
+  if (type === 'audio') return <Mic className="h-3.5 w-3.5" />;
   if (type === 'file') return <Paperclip className="h-3.5 w-3.5" />;
   return null;
 }
@@ -40,7 +41,15 @@ export function ConversationItem({
     if (last.deleted) previewText = 'Message deleted';
     else if (last.type === 'system') previewText = last.content ?? '';
     else if (last.type === 'text') previewText = last.content ?? '';
-    else previewText = last.type === 'image' ? 'Photo' : last.type === 'video' ? 'Video' : 'File';
+    else
+      previewText =
+        last.type === 'image'
+          ? 'Photo'
+          : last.type === 'video'
+            ? 'Video'
+            : last.type === 'audio'
+              ? 'Voice message'
+              : 'File';
   }
 
   return (

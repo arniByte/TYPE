@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Download, FileText, Play, AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Download, FileText, Play, AlertCircle, Mic } from 'lucide-react';
 import { useSignedUrl } from '@/hooks/useSignedUrl';
 import { Spinner } from '@/components/ui/Spinner';
+import { VoicePlayer } from './VoicePlayer';
 import { formatBytes } from '@/lib/utils';
 import type { MediaMetadata, MessageType } from '@/lib/types/database';
 
@@ -39,6 +40,40 @@ export function MediaMessage({
   const { url: signed, refresh } = useSignedUrl(previewUrl ? null : path);
   const url = previewUrl ?? signed;
   const [errored, setErrored] = useState(false);
+
+  // Release the optimistic blob URL once it's replaced (by the signed URL) or on unmount.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  if (type === 'audio') {
+    if (errored) {
+      return (
+        <button
+          onClick={() => {
+            setErrored(false);
+            refresh();
+          }}
+          className="flex items-center gap-2 py-1.5 text-xs opacity-70"
+        >
+          <AlertCircle className="h-4 w-4" /> Tap to retry
+        </button>
+      );
+    }
+    if (!url) {
+      return (
+        <div className="flex items-center gap-2.5 py-0.5">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-lime/20 text-lime-deep">
+            <Mic className="h-4 w-4" />
+          </span>
+          <Spinner className="h-4 w-4 opacity-60" />
+        </div>
+      );
+    }
+    return <VoicePlayer src={url} duration={metadata?.duration} onError={() => setErrored(true)} />;
+  }
 
   if (type === 'file') {
     return (
