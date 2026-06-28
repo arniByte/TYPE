@@ -7,7 +7,8 @@
 A full web messenger: email / Google / Web3 (Solana+Ethereum) / quick @handle
 sign-in, 1:1 + group chat, realtime, photo/video sharing, **voice messages**,
 contacts & requests, typing, presence, read receipts — plus a hidden **bunny
-mini-game**. Built to run **free** on Vercel + Supabase.
+mini-game**. Built to run **free** on Vercel + Supabase. **Installable PWA**
+(standalone, full-screen on mobile via `app/manifest.ts`).
 
 ## 2. Live coordinates
 | | |
@@ -15,7 +16,7 @@ mini-game**. Built to run **free** on Vercel + Supabase.
 | **Production URL** | https://type-hellowrld.vercel.app  (use this stable domain — per-deploy preview URLs change and drop auth cookies) |
 | **GitHub repo** | `arniByte/TYPE` (default branch `main`) |
 | **Dev branch** | `claude/type-messenger-app-l0tj1g` — PRs squash-merged to `main` → Vercel auto-deploys. (Workflow to ship: commit → `git rebase --onto origin/main <prev-tip> <branch>` → force-push → PR → squash-merge.) |
-| **Vercel** | project `type`, team **hellowrld** (Hobby). Git integration on `main`. |
+| **Vercel** | project `type`, team **hellowrld** (Hobby). Git integration on `main`. **`vercel.json` pins serverless functions to `icn1` (Seoul)** so they sit next to Supabase (ap-northeast-2) — kills the ~1s transpacific round-trip that made the app feel slow. (Takes effect only once it's on `main` + redeployed.) |
 | **Supabase** | project **`heirpnnazjrcnfljridj`** ("type"), region ap-northeast-2, Postgres 17 — **connected via Supabase MCP connector** (can run SQL/migrations/advisors directly) |
 | **Supabase URL** | https://heirpnnazjrcnfljridj.supabase.co |
 | **Publishable key** | `sb_publishable_W93CwtFiFx6Cq2X13Qdd_w_-4VM5UQE` (public, browser-safe; RLS enforces access) |
@@ -47,7 +48,11 @@ Next.js 15 (App Router, React 19, TS strict) · Tailwind 3.4 · Supabase
   landing (`components/auth/QuickAuth.tsx` + `lib/auth.ts` — maps `@handle` to a
   synthetic email `handle@guest.type.app`; **requires Supabase "Confirm email" OFF**).
 - **Chat:** 1:1 + group, realtime, typing, presence, read receipts, edits,
-  soft-delete, replies (+ **swipe-right-to-reply** on mobile), optimistic send.
+  soft-delete, replies (**directional swipe-to-reply** on mobile — incoming
+  messages swipe **right**, your own swipe **left**, like WhatsApp/Telegram;
+  `MessageBubble.tsx`, `dir = isOwn ? -1 : 1`), optimistic send. Only messages
+  that arrive **after** first paint play the pop-in (`MessageList` baseline ref),
+  so opening a chat paints instantly with no animation cascade.
 - **Media:** photos/videos/files + **voice messages** (record in composer →
   custom `VoicePlayer`). Private `media` bucket, signed URLs.
 - **Contacts:** search, requests (accept/decline), block/unblock.
@@ -74,6 +79,10 @@ Next.js 15 (App Router, React 19, TS strict) · Tailwind 3.4 · Supabase
 - **Auth/SSR** (`lib/supabase/{client,server,middleware}.ts`, `middleware.ts`):
   `@supabase/ssr` getAll/setAll cookies; `getUser()` gates routes; callback
   `app/auth/callback`, email link `app/auth/confirm`, signout POST route.
+  **Middleware matcher is narrowed to `/app/:path*`, `/login`, `/signup` only**
+  — Edge middleware ignores the region pin, so running `getUser()` on the landing
+  / public routes was a pure transpacific cost. Now the landing + auth screens
+  prerender static; `/app` still refreshes the session + gates server-side.
 - **Storage:** `avatars` (public read via getPublicUrl, no list policy), `media`
   (private; `{conversationId}/{userId}/{uuid}`; signed URLs via `hooks/useSignedUrl.ts`).
 

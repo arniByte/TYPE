@@ -75,13 +75,6 @@ const config: Config = {
           '25%': { transform: 'translateY(-6px) rotate(-1.5deg)' },
           '60%': { transform: 'translateY(-10px) rotate(1.5deg)' },
         },
-        'bunny-hop': {
-          '0%, 70%, 100%': { transform: 'translateY(0)' },
-          '78%': { transform: 'translateY(-14px)' },
-          '86%': { transform: 'translateY(0)' },
-          '90%': { transform: 'translateY(-5px)' },
-          '94%': { transform: 'translateY(0)' },
-        },
         'aura-pulse': {
           '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
           '50%': { opacity: '1', transform: 'scale(1.08)' },
@@ -105,7 +98,6 @@ const config: Config = {
         'bubble-in': 'bubble-in 0.22s cubic-bezier(0.22,1,0.36,1) both',
         blink: 'blink 1.2s ease-in-out infinite',
         'bunny-float': 'bunny-float 4s ease-in-out infinite',
-        'bunny-hop': 'bunny-hop 5.5s ease-in-out infinite',
         'aura-pulse': 'aura-pulse 4s ease-in-out infinite',
         'slide-in-right': 'slide-in-right 0.3s cubic-bezier(0.22,1,0.36,1) both',
         'slide-in-up': 'slide-in-up 0.3s cubic-bezier(0.22,1,0.36,1) both',

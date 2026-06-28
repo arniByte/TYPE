@@ -79,13 +79,6 @@ export function useRealtimeMessages(conversationId: string, initial: Message[] =
     [sync],
   );
 
-  const removeLocal = useCallback(
-    (id: string) => {
-      if (mapRef.current.delete(id)) sync();
-    },
-    [sync],
-  );
-
   // Subscribe + initial load + catch-up, reset when the conversation changes.
   useEffect(() => {
     // Seed from the server-rendered messages for an instant first paint; the
@@ -206,5 +199,5 @@ export function useRealtimeMessages(conversationId: string, initial: Message[] =
     setLoadingOlder(false);
   }, [conversationId, supabase, hasMore, loadingOlder, upsertReal]);
 
-  return { messages, initialLoaded, hasMore, loadingOlder, loadOlder, addPending, markFailed, removeLocal };
+  return { messages, initialLoaded, hasMore, loadingOlder, loadOlder, addPending, markFailed };
 }

@@ -56,7 +56,7 @@ export function ConversationItem({
     <Link
       href={`/app/c/${c.id}`}
       className={cn(
-        'group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors',
+        'group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-all duration-150 active:scale-[0.98]',
         active ? 'bg-elevated' : 'hover:bg-hover',
       )}
     >

@@ -62,6 +62,22 @@ export function MessageList({
   const prevHeight = useRef<number | null>(null);
   const [showJump, setShowJump] = useState(false);
 
+  // Baseline = the first non-empty page we paint. Bubbles in it (and any older
+  // page fetched later) render instantly; only genuinely newer messages — live
+  // arrivals and your optimistic sends — play the pop-in. Avoids the 30-bubble
+  // cascade when opening a chat.
+  const baseline = useRef<{ ids: Set<string>; newest: string } | null>(null);
+  if (baseline.current === null && messages.length > 0) {
+    baseline.current = {
+      ids: new Set(messages.map((m) => m.id)),
+      newest: messages[messages.length - 1].created_at,
+    };
+  }
+  function shouldAnimate(m: ChatMessage) {
+    const base = baseline.current;
+    return !!base && !base.ids.has(m.id) && m.created_at >= base.newest;
+  }
+
   function onScroll() {
     const el = scroller.current;
     if (!el) return;
@@ -119,7 +135,7 @@ export function MessageList({
       <div
         ref={scroller}
         onScroll={onScroll}
-        className="h-full overflow-y-auto px-3 py-2 sm:px-6"
+        className="h-full overflow-y-auto overscroll-contain px-3 py-2 sm:px-6"
       >
         {!initialLoaded ? (
           <div className="grid h-full place-items-center text-muted">
@@ -215,6 +231,7 @@ export function MessageList({
                     replySnippet={replySnippet}
                     seen={seen}
                     previewUrl={m._previewUrl}
+                    animate={shouldAnimate(m)}
                     onReply={onReply}
                   />
                 </div>
@@ -227,7 +244,7 @@ export function MessageList({
       <button
         onClick={jumpToLatest}
         className={cn(
-          'absolute bottom-4 right-4 grid h-10 w-10 place-items-center rounded-full border border-line bg-elevated text-fg shadow-pop transition-all',
+          'absolute bottom-4 right-4 grid h-10 w-10 place-items-center rounded-full border border-line bg-elevated text-fg shadow-pop transition-all active:scale-90',
           showJump ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0',
         )}
         aria-label="Jump to latest"
