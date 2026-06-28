@@ -201,7 +201,7 @@ export function Composer({
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0"
+          className="shrink-0 rounded-full"
           onClick={() => fileRef.current?.click()}
           aria-label="Attach photo or video"
         >
@@ -224,7 +224,7 @@ export function Composer({
               handleSend();
             }
           }}
-          className="focus-ring max-h-40 min-h-[44px] flex-1 resize-none rounded-2xl border border-line bg-elevated px-4 py-2.5 text-sm text-fg placeholder:text-faint focus:border-lime/50"
+          className="focus-ring max-h-40 min-h-[44px] flex-1 resize-none rounded-2xl border border-line bg-elevated px-4 py-2.5 text-sm text-fg placeholder:text-faint focus:border-lime-deep/60"
         />
 
         <Button

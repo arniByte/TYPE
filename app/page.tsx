@@ -42,11 +42,11 @@ export default async function LandingPage() {
 
       {/* Hero */}
       <main className="relative flex flex-1 flex-col items-center justify-center px-5 pb-24 text-center">
-        <BunnyAscii sizeClass="text-3xl sm:text-5xl" className="mb-2" />
+        <BunnyAscii sizeClass="text-3xl sm:text-5xl" className="mb-8 sm:mb-10" />
 
-        <h1 className="font-display leading-none text-fg text-[5.5rem] sm:text-[11rem]">TYPE</h1>
+        <h1 className="font-display text-fg text-[3.5rem] leading-[1.1] pb-2 sm:text-[8rem]">TYPE</h1>
 
-        <p className="mt-1 text-xl font-medium sm:text-2xl">
+        <p className="mt-6 text-xl font-medium sm:text-2xl">
           where <span className="mark">words</span> matter
         </p>
 

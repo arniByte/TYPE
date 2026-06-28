@@ -19,6 +19,22 @@ function GoogleIcon() {
   );
 }
 
+function SolanaIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+      <path d="M6.4 16.7c.1-.1.3-.2.5-.2h13.4c.3 0 .5.4.3.6l-2.6 2.6c-.1.1-.3.2-.5.2H4.1c-.3 0-.5-.4-.3-.6l2.6-2.6Zm0-9.4c.2-.1.3-.2.5-.2h13.4c.3 0 .5.4.3.6L18 10.3c-.1.1-.3.2-.5.2H4.1c-.3 0-.5-.4-.3-.6l2.6-2.6Zm11.2 4.7c-.1-.1-.3-.2-.5-.2H3.7c-.3 0-.5.4-.3.6l2.6 2.6c.1.1.3.2.5.2h13.4c.3 0 .5-.4.3-.6l-2.6-2.6Z" />
+    </svg>
+  );
+}
+
+function EthereumIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+      <path d="M12 2 6 12l6 3.5L18 12 12 2Zm0 15.2L6 13.7 12 22l6-8.3-6 3.5Z" />
+    </svg>
+  );
+}
+
 export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const supabase = createClient();
   const router = useRouter();
@@ -33,6 +49,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const [error, setError] = useState<string | null>(initialError);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [web3Loading, setWeb3Loading] = useState<'solana' | 'ethereum' | null>(null);
   const [emailSent, setEmailSent] = useState(false);
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -61,18 +78,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
           },
         });
         if (error) throw error;
-        // If email confirmation is on, there's no session yet — the chosen
-        // handle is stored in metadata and claimed by ensure_profile on confirm.
+        // The chosen handle rides in user metadata; handle_new_user (and
+        // ensure_profile as a fallback) claim it with collision-safe suffixing.
         if (!data.session) {
           setEmailSent(true);
         } else {
-          // Best-effort claim of the chosen handle right away (works whether or
-          // not the profile row already exists).
-          if (data.user) {
-            await supabase
-              .from('profiles')
-              .upsert({ id: data.user.id, username: handle }, { onConflict: 'id' });
-          }
           router.push(next);
           router.refresh();
         }
@@ -81,6 +91,34 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleWeb3(chain: 'solana' | 'ethereum') {
+    setError(null);
+    setWeb3Loading(chain);
+    try {
+      const w = window as unknown as { solana?: unknown; ethereum?: unknown };
+      const provider = chain === 'solana' ? w.solana : w.ethereum;
+      if (!provider) {
+        throw new Error(
+          chain === 'solana'
+            ? 'No Solana wallet found. Install Phantom and try again.'
+            : 'No Ethereum wallet found. Install MetaMask and try again.',
+        );
+      }
+      const statement = 'Sign in to TYPE';
+      const { error } =
+        chain === 'solana'
+          ? await supabase.auth.signInWithWeb3({ chain: 'solana', statement })
+          : await supabase.auth.signInWithWeb3({ chain: 'ethereum', statement });
+      if (error) throw error;
+      router.push(next);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Wallet sign-in failed');
+    } finally {
+      setWeb3Loading(null);
     }
   }
 
@@ -130,6 +168,29 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         <GoogleIcon />
         Continue with Google
       </Button>
+
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          size="lg"
+          onClick={() => handleWeb3('solana')}
+          loading={web3Loading === 'solana'}
+        >
+          <SolanaIcon />
+          Solana
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          size="lg"
+          onClick={() => handleWeb3('ethereum')}
+          loading={web3Loading === 'ethereum'}
+        >
+          <EthereumIcon />
+          Ethereum
+        </Button>
+      </div>
 
       <div className="my-5 flex items-center gap-3 text-xs text-faint">
         <span className="h-px flex-1 bg-line" />

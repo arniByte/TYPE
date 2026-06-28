@@ -20,7 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             'focus-ring h-11 w-full rounded-xl border bg-elevated px-3.5 text-sm text-fg',
             'placeholder:text-faint transition-colors',
-            'hover:border-line-strong focus:border-lime/50',
+            'hover:border-line-strong focus:border-lime-deep/60 focus:ring-2 focus:ring-lime-deep/20',
             icon && 'pl-10',
             invalid ? 'border-danger/60' : 'border-line',
             className,

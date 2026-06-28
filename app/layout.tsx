@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono, Great_Vibes } from 'next/font/google';
+import { Inter, JetBrains_Mono, Pacifico } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -14,7 +14,7 @@ const mono = JetBrains_Mono({
   display: 'swap',
 });
 
-const display = Great_Vibes({
+const display = Pacifico({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-display',
