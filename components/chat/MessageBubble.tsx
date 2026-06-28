@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Reply,
   MoreVertical,
@@ -52,9 +52,15 @@ export function MessageBubble({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(message.content ?? '');
   const [saving, setSaving] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const drag = useRef({ x: 0, y: 0, active: false });
 
   const isDeleted = !!message.deleted_at;
-  const isMedia = message.type === 'image' || message.type === 'video' || message.type === 'file';
+  const isMedia =
+    message.type === 'image' ||
+    message.type === 'video' ||
+    message.type === 'file' ||
+    message.type === 'audio';
   const senderName = sender?.display_name || sender?.username || 'Unknown';
 
   async function saveEdit() {
@@ -73,14 +79,54 @@ export function MessageBubble({
     await supabase.rpc('delete_message', { _id: message.id });
   }
 
+  // Swipe-right-to-reply (touch / mobile).
+  const canSwipe = !isDeleted && !message._pending;
+  function onTouchStart(e: React.TouchEvent) {
+    if (!canSwipe) return;
+    const t = e.touches[0];
+    drag.current = { x: t.clientX, y: t.clientY, active: true };
+  }
+  function onTouchMove(e: React.TouchEvent) {
+    if (!drag.current.active) return;
+    const t = e.touches[0];
+    const dx = t.clientX - drag.current.x;
+    const dy = t.clientY - drag.current.y;
+    // Let vertical scroll win; only translate once the gesture is clearly horizontal.
+    if (Math.abs(dy) > Math.abs(dx)) {
+      drag.current.active = false;
+      setDragX(0);
+      return;
+    }
+    setDragX(dx > 8 ? Math.min(dx, 72) : 0);
+  }
+  function onTouchEnd() {
+    if (drag.current.active && dragX > 52) onReply(message);
+    drag.current.active = false;
+    setDragX(0);
+  }
+
   return (
     <div
       className={cn(
-        'group flex w-full items-end gap-2',
+        'group relative flex w-full items-end gap-2',
         isOwn ? 'flex-row-reverse' : 'flex-row',
         showAvatar || isOwn ? 'mt-2' : 'mt-0.5',
       )}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      style={{ touchAction: 'pan-y' }}
     >
+      {/* Swipe-to-reply hint */}
+      {dragX > 4 && (
+        <span
+          className="pointer-events-none absolute left-1 top-1/2 -translate-y-1/2 text-lime-deep"
+          style={{ opacity: Math.min(dragX / 52, 1) }}
+        >
+          <Reply className="h-4 w-4" />
+        </span>
+      )}
+
       {/* Avatar gutter for incoming group messages */}
       {isGroup && !isOwn && (
         <div className="w-7 shrink-0">
@@ -88,7 +134,13 @@ export function MessageBubble({
         </div>
       )}
 
-      <div className={cn('flex max-w-[78%] flex-col sm:max-w-[68%]', isOwn ? 'items-end' : 'items-start')}>
+      <div
+        className={cn('flex max-w-[78%] flex-col sm:max-w-[68%]', isOwn ? 'items-end' : 'items-start')}
+        style={{
+          transform: dragX ? `translateX(${dragX}px)` : undefined,
+          transition: drag.current.active ? 'none' : 'transform 0.18s ease-out',
+        }}
+      >
         {showSender && isGroup && !isOwn && (
           <span className={cn('mb-0.5 px-1 text-xs font-semibold', tintFor(senderName).split(' ')[1])}>
             {senderName}

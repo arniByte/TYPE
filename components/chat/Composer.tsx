@@ -1,12 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Plus, Send, X, Image as ImageIcon, Film, CornerUpLeft, Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Plus, Send, X, Image as ImageIcon, Film, CornerUpLeft, Loader2, Mic, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { cn, formatBytes } from '@/lib/utils';
 import { uploadMedia, messageTypeForFile, MAX_FILE_BYTES } from '@/lib/media';
+import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { useApp } from './AppProvider';
 import type { ChatMessage } from '@/hooks/useRealtimeMessages';
+
+function fmtClock(s: number) {
+  const m = Math.floor(s / 60);
+  return `${m}:${String(s % 60).padStart(2, '0')}`;
+}
 
 export type ReplyTarget = { id: string; name: string; text: string } | null;
 
@@ -36,6 +42,16 @@ export function Composer({
   const [error, setError] = useState<string | null>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const voice = useVoiceRecorder();
+
+  // Stable image thumbnails (avoid creating a fresh blob URL on every render).
+  const filePreviews = useMemo(
+    () => files.map((f) => (f.type.startsWith('image/') ? URL.createObjectURL(f) : null)),
+    [files],
+  );
+  useEffect(() => {
+    return () => filePreviews.forEach((u) => u && URL.revokeObjectURL(u));
+  }, [filePreviews]);
 
   // Clear the typing indicator when leaving the conversation.
   useEffect(() => () => notifyStop(), [notifyStop]);
@@ -137,6 +153,49 @@ export function Composer({
     }
   }
 
+  async function startVoice() {
+    setError(null);
+    const ok = await voice.start();
+    if (!ok) setError('Microphone access was denied.');
+  }
+
+  async function sendVoice() {
+    const secs = voice.seconds;
+    const blob = await voice.stop();
+    if (!blob || blob.size < 600) {
+      setError('Hold on a little longer to record a voice message.');
+      return;
+    }
+    const ext = /mp4|m4a|aac/.test(blob.type) ? 'm4a' : 'webm';
+    const file = new File([blob], `voice-${Date.now()}.${ext}`, { type: blob.type || 'audio/webm' });
+    const previewUrl = URL.createObjectURL(blob);
+    const replyId = reply?.id ?? null;
+    const msg = newMessage({ type: 'audio', reply_to: replyId });
+    msg._previewUrl = previewUrl;
+    onCancelReply();
+    addPending(msg);
+    onSent();
+    setUploading(true);
+    try {
+      const { path, metadata } = await uploadMedia(supabase, conversationId, me.id, file);
+      const { error: insErr } = await supabase.from('messages').insert({
+        id: msg.id,
+        conversation_id: conversationId,
+        sender_id: me.id,
+        type: 'audio',
+        media_url: path,
+        media_metadata: { ...metadata, duration: secs },
+        reply_to: msg.reply_to,
+      });
+      if (insErr) markFailed(msg.id);
+    } catch (err) {
+      markFailed(msg.id);
+      setError(err instanceof Error ? err.message : 'Could not send voice message');
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <div className="border-t border-line bg-surface px-3 pb-safe pt-2 sm:px-4">
       {/* Reply bar */}
@@ -164,7 +223,7 @@ export function Composer({
               <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-canvas text-muted">
                 {f.type.startsWith('image/') ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={URL.createObjectURL(f)} alt={f.name} className="h-full w-full object-cover" />
+                  <img src={filePreviews[i] ?? ''} alt={f.name} className="h-full w-full object-cover" />
                 ) : f.type.startsWith('video/') ? (
                   <Film className="h-4 w-4" />
                 ) : (
@@ -189,54 +248,94 @@ export function Composer({
 
       {error && <p className="mb-2 px-1 text-xs text-danger">{error}</p>}
 
-      <div className="flex items-end gap-2">
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*,video/*"
-          multiple
-          className="hidden"
-          onChange={onPick}
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="shrink-0 rounded-full"
-          onClick={() => fileRef.current?.click()}
-          aria-label="Attach photo or video"
-        >
-          <Plus className="h-5 w-5" />
-        </Button>
+      {voice.recording ? (
+        <div className="flex items-center gap-2 animate-fade-in">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 rounded-full text-danger"
+            onClick={voice.cancel}
+            aria-label="Cancel recording"
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
+          <div className="flex h-11 flex-1 items-center gap-2.5 rounded-2xl border border-line bg-elevated px-4">
+            <span className="h-2.5 w-2.5 rounded-full bg-danger animate-rec-pulse" />
+            <span className="text-sm font-semibold tabular-nums">{fmtClock(voice.seconds)}</span>
+            <span className="hidden truncate text-xs text-muted sm:inline">Recording — tap send to share</span>
+          </div>
+          <Button
+            size="icon"
+            className="shrink-0 rounded-full"
+            onClick={sendVoice}
+            disabled={uploading}
+            aria-label="Send voice message"
+          >
+            {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+          </Button>
+        </div>
+      ) : (
+        <div className="flex items-end gap-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*,video/*"
+            multiple
+            className="hidden"
+            onChange={onPick}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 rounded-full"
+            onClick={() => fileRef.current?.click()}
+            aria-label="Attach photo or video"
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
 
-        <textarea
-          ref={taRef}
-          value={value}
-          rows={1}
-          placeholder="Type a message"
-          onChange={(e) => {
-            setValue(e.target.value);
-            autoresize();
-            notifyTyping();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-          className="focus-ring max-h-40 min-h-[44px] flex-1 resize-none rounded-2xl border border-line bg-elevated px-4 py-2.5 text-sm text-fg placeholder:text-faint focus:border-lime-deep/60"
-        />
+          <textarea
+            ref={taRef}
+            value={value}
+            rows={1}
+            placeholder="Type a message"
+            onChange={(e) => {
+              setValue(e.target.value);
+              autoresize();
+              notifyTyping();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            className="focus-ring max-h-40 min-h-[44px] flex-1 resize-none rounded-2xl border border-line bg-elevated px-4 py-2.5 text-sm text-fg placeholder:text-faint focus:border-lime-deep/60"
+          />
 
-        <Button
-          size="icon"
-          className={cn('shrink-0 rounded-full', !value.trim() && files.length === 0 && 'opacity-60')}
-          onClick={handleSend}
-          disabled={(!value.trim() && files.length === 0) || uploading}
-          aria-label="Send"
-        >
-          {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-        </Button>
-      </div>
+          {value.trim() || files.length > 0 ? (
+            <Button
+              size="icon"
+              className="shrink-0 rounded-full"
+              onClick={handleSend}
+              disabled={uploading}
+              aria-label="Send"
+            >
+              {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="shrink-0 rounded-full"
+              onClick={startVoice}
+              aria-label="Record voice message"
+            >
+              <Mic className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

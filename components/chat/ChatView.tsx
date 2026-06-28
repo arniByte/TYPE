@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { mediaLabel } from '@/lib/utils';
 import { useApp } from './AppProvider';
 import { useRealtimeMessages, type ChatMessage } from '@/hooks/useRealtimeMessages';
 import { useTyping } from '@/hooks/useTyping';
@@ -120,9 +121,7 @@ export function ChatView({
         m.sender_id === me.id
           ? 'yourself'
           : profiles.get(m.sender_id)?.display_name || profiles.get(m.sender_id)?.username || 'Unknown';
-      const text = m.deleted_at
-        ? 'Deleted message'
-        : m.content || (m.type === 'image' ? 'Photo' : m.type === 'video' ? 'Video' : 'File');
+      const text = m.deleted_at ? 'Deleted message' : m.content || mediaLabel(m.type);
       setReply({ id: m.id, name, text });
     },
     [me.id, profiles],
@@ -131,7 +130,7 @@ export function ChatView({
   const online = !isGroup && peer ? isOnline(peer.id) : false;
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-canvas">
+    <div className="flex h-full min-h-0 flex-col bg-canvas lg:animate-none animate-slide-in-right">
       <ChatHeader
         conversation={conversation}
         peer={peer}

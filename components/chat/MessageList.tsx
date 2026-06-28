@@ -5,7 +5,7 @@ import { ChevronDown } from 'lucide-react';
 import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { isSameDay, formatDayLabel } from '@/lib/time';
-import { cn } from '@/lib/utils';
+import { cn, mediaLabel } from '@/lib/utils';
 import { MessageBubble, type ReplySnippet } from './MessageBubble';
 import type { Profile } from '@/lib/types/database';
 import type { ChatMessage } from '@/hooks/useRealtimeMessages';
@@ -191,8 +191,7 @@ export function MessageList({
                         'Unknown';
                   const tText = target.deleted_at
                     ? 'Deleted message'
-                    : target.content ||
-                      (target.type === 'image' ? 'Photo' : target.type === 'video' ? 'Video' : 'File');
+                    : target.content || mediaLabel(target.type);
                   replySnippet = { name: tName, text: tText };
                 }
               }

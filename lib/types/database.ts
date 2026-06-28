@@ -2,7 +2,7 @@
 // supabase/migrations/0001_init.sql. (You can regenerate with
 // `supabase gen types typescript` if you prefer.)
 
-export type MessageType = 'text' | 'image' | 'video' | 'file' | 'system';
+export type MessageType = 'text' | 'image' | 'video' | 'file' | 'audio' | 'system';
 export type ConversationType = 'direct' | 'group';
 export type ContactStatus = 'pending' | 'accepted' | 'blocked';
 export type MemberRole = 'admin' | 'member';

@@ -120,7 +120,7 @@ export function ContactsView() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-canvas">
+    <div className="flex h-full flex-col bg-canvas animate-slide-in-right lg:animate-none">
       <header className="flex items-center gap-2 border-b border-line bg-surface/80 px-2 py-3 backdrop-blur sm:px-4">
         <Link href="/app" className="lg:hidden">
           <Button variant="ghost" size="icon" aria-label="Back">
