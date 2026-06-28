@@ -100,6 +100,8 @@ begin
           values (uid, candidate, initcap(base)) on conflict (id) do nothing;
           return;
         end if;
+      when others then
+        return; -- never loop forever; profile will be retried on next load
     end;
   end loop;
 end;

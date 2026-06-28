@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Camera, Check, LogOut, AlertCircle } from 'lucide-react';
@@ -25,6 +25,11 @@ export function SettingsView() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  // Guarantee a profile row exists so edits below always target a real row.
+  useEffect(() => {
+    supabase.rpc('ensure_profile');
+  }, [supabase]);
 
   async function onAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -53,15 +58,17 @@ export function SettingsView() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase
-      .from('profiles')
-      .update({
+    const { error } = await supabase.from('profiles').upsert(
+      {
+        id: me.id,
         username: uname,
         display_name: displayName.trim() || null,
         bio: bio.trim() || null,
         status: status.trim() || null,
-      })
-      .eq('id', me.id);
+        avatar_url: avatar,
+      },
+      { onConflict: 'id' },
+    );
     setSaving(false);
     if (error) {
       setError(

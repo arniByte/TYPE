@@ -108,7 +108,7 @@ export function MessageBubble({
             <div
               className={cn(
                 'mb-1.5 flex items-start gap-1.5 rounded-lg border-l-2 px-2 py-1 text-xs',
-                isOwn ? 'border-lime-ink/40 bg-black/10' : 'border-lime/50 bg-black/20',
+                isOwn ? 'border-lime-ink/40 bg-black/10' : 'border-lime-deep/50 bg-black/5',
               )}
             >
               <CornerUpLeft className="mt-0.5 h-3 w-3 shrink-0 opacity-70" />

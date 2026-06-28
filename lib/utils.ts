@@ -7,14 +7,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /** Deterministic accent/initials helpers for avatars without an image. */
+// Readable on the light canvas: soft tinted backgrounds with strong -700 text.
 const AVATAR_TINTS = [
-  'bg-lime/15 text-lime',
-  'bg-sky-400/15 text-sky-300',
-  'bg-violet-400/15 text-violet-300',
-  'bg-amber-400/15 text-amber-300',
-  'bg-rose-400/15 text-rose-300',
-  'bg-emerald-400/15 text-emerald-300',
-  'bg-cyan-400/15 text-cyan-300',
+  'bg-lime/20 text-lime-deep',
+  'bg-sky-500/15 text-sky-700',
+  'bg-violet-500/15 text-violet-700',
+  'bg-amber-500/15 text-amber-700',
+  'bg-rose-500/15 text-rose-700',
+  'bg-emerald-500/15 text-emerald-700',
+  'bg-cyan-500/15 text-cyan-700',
 ] as const;
 
 export function tintFor(seed: string): string {

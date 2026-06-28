@@ -186,7 +186,7 @@ export function ConversationInfoModal({
             {isAdmin && (
               <button
                 onClick={() => setAddOpen((v) => !v)}
-                className="flex items-center gap-1 text-xs text-lime hover:underline"
+                className="flex items-center gap-1 text-xs text-lime-deep hover:underline"
               >
                 <UserPlus className="h-3.5 w-3.5" /> Add
               </button>
@@ -216,7 +216,7 @@ export function ConversationInfoModal({
                         <span className="block truncate text-sm">{u.display_name || u.username}</span>
                         <span className="block truncate text-xs text-muted">@{u.username}</span>
                       </span>
-                      <UserPlus className="h-4 w-4 text-lime" />
+                      <UserPlus className="h-4 w-4 text-lime-deep" />
                     </button>
                   ))}
                 </div>
@@ -240,7 +240,7 @@ export function ConversationInfoModal({
                   <p className="truncate text-xs text-muted">@{m.profile.username}</p>
                 </div>
                 {m.role === 'admin' && (
-                  <span className="flex items-center gap-1 text-[11px] font-semibold text-lime">
+                  <span className="flex items-center gap-1 text-[11px] font-semibold text-lime-deep">
                     <Crown className="h-3.5 w-3.5" /> Admin
                   </span>
                 )}

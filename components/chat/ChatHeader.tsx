@@ -30,7 +30,7 @@ export function ChatHeader({
   let subtitle: React.ReactNode;
   if (typingNames.length > 0) {
     subtitle = (
-      <span className="flex items-center gap-1.5 text-lime">
+      <span className="flex items-center gap-1.5 text-lime-deep">
         <TypingDots />
         typing…
       </span>
