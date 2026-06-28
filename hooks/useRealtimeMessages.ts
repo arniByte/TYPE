@@ -29,13 +29,15 @@ function sortAsc(a: ChatMessage, b: ChatMessage) {
  *  - Optimistic rows carry a client uuid; the realtime echo with the same id
  *    transparently replaces them.
  */
-export function useRealtimeMessages(conversationId: string) {
+export function useRealtimeMessages(conversationId: string, initial: Message[] = []) {
   const { supabase } = useApp();
+  const initialRef = useRef(initial);
+  initialRef.current = initial;
   const mapRef = useRef(new Map<string, ChatMessage>());
   const listRef = useRef<ChatMessage[]>([]);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [initialLoaded, setInitialLoaded] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => initial.slice().sort(sortAsc));
+  const [initialLoaded, setInitialLoaded] = useState(initial.length > 0);
+  const [hasMore, setHasMore] = useState(initial.length >= PAGE);
   const [loadingOlder, setLoadingOlder] = useState(false);
 
   const sync = useCallback(() => {
@@ -86,11 +88,15 @@ export function useRealtimeMessages(conversationId: string) {
 
   // Subscribe + initial load + catch-up, reset when the conversation changes.
   useEffect(() => {
-    mapRef.current = new Map();
-    listRef.current = [];
-    setMessages([]);
-    setInitialLoaded(false);
-    setHasMore(false);
+    // Seed from the server-rendered messages for an instant first paint; the
+    // subscribe-then-fetch flow below reconciles anything newer (id-deduped).
+    const seed = initialRef.current;
+    mapRef.current = new Map(seed.map((m) => [m.id, { ...m } as ChatMessage]));
+    const seededArr = Array.from(mapRef.current.values()).sort(sortAsc);
+    listRef.current = seededArr;
+    setMessages(seededArr);
+    setInitialLoaded(seed.length > 0);
+    setHasMore(seed.length >= PAGE);
 
     let buffer: Message[] = [];
     let ready = false;

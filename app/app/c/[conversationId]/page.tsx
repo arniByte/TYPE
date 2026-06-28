@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { ChatView } from '@/components/chat/ChatView';
 import type { Member } from '@/components/chat/ConversationInfoModal';
-import type { Conversation, MemberRole, Profile } from '@/lib/types/database';
+import type { Conversation, MemberRole, Message, Profile } from '@/lib/types/database';
 
 type MemberRow = {
   user_id: string;
@@ -12,6 +12,8 @@ type MemberRow = {
   profiles: Profile;
 };
 
+const PAGE = 30;
+
 export default async function ConversationPage({
   params,
 }: {
@@ -20,19 +22,24 @@ export default async function ConversationPage({
   const { conversationId } = await params;
   const supabase = await createClient();
 
-  // RLS ensures we only see conversations we belong to.
-  const { data: conversation } = await supabase
-    .from('conversations')
-    .select('*')
-    .eq('id', conversationId)
-    .maybeSingle();
+  // Conversation + roster + latest messages, all in parallel. RLS ensures we
+  // only see (and only receive messages for) conversations we belong to.
+  const [{ data: conversation }, { data: memberRows }, { data: messageRows }] = await Promise.all([
+    supabase.from('conversations').select('*').eq('id', conversationId).maybeSingle(),
+    supabase
+      .from('conversation_members')
+      .select('user_id, role, last_read_at, joined_at, profiles(*)')
+      .eq('conversation_id', conversationId)
+      .order('joined_at', { ascending: true }),
+    supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(PAGE),
+  ]);
   if (!conversation) notFound();
-
-  const { data: memberRows } = await supabase
-    .from('conversation_members')
-    .select('user_id, role, last_read_at, joined_at, profiles(*)')
-    .eq('conversation_id', conversationId)
-    .order('joined_at', { ascending: true });
 
   const members: Member[] = ((memberRows ?? []) as unknown as MemberRow[])
     .filter((r) => r.profiles)
@@ -43,5 +50,13 @@ export default async function ConversationPage({
       profile: r.profiles,
     }));
 
-  return <ChatView conversation={conversation as Conversation} initialMembers={members} />;
+  const initialMessages = ((messageRows ?? []) as Message[]).slice().reverse(); // ascending
+
+  return (
+    <ChatView
+      conversation={conversation as Conversation}
+      initialMembers={members}
+      initialMessages={initialMessages}
+    />
+  );
 }

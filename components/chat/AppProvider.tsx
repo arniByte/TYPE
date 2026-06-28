@@ -30,10 +30,18 @@ export function useApp() {
   return ctx;
 }
 
-export function AppProvider({ me, children }: { me: Profile; children: React.ReactNode }) {
+export function AppProvider({
+  me,
+  initialConversations = [],
+  children,
+}: {
+  me: Profile;
+  initialConversations?: ConversationOverview[];
+  children: React.ReactNode;
+}) {
   const supabase = useMemo(() => createClient(), []);
-  const [conversations, setConversations] = useState<ConversationOverview[]>([]);
-  const [loadingConversations, setLoading] = useState(true);
+  const [conversations, setConversations] = useState<ConversationOverview[]>(initialConversations);
+  const [loadingConversations, setLoading] = useState(initialConversations.length === 0);
   const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppProvider } from '@/components/chat/AppProvider';
 import { AppShell } from '@/components/chat/AppShell';
-import type { Profile } from '@/lib/types/database';
+import type { ConversationOverview, Profile } from '@/lib/types/database';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -11,13 +11,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  // Safety net for the OAuth-first-load profile race.
-  await supabase.rpc('ensure_profile');
-
-  let { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  // Profile + conversation list in parallel. ensure_profile is only an RPC
+  // round-trip on the rare path where the profile row is genuinely missing.
+  let [{ data: profile }, { data: overview }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+    supabase.rpc('get_conversation_overview'),
+  ]);
   if (!profile) {
     await supabase.rpc('ensure_profile');
-    ({ data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single());
+    ({ data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle());
   }
 
   const me: Profile =
@@ -34,8 +36,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       updated_at: new Date().toISOString(),
     } satisfies Profile);
 
+  const initialConversations = (overview as unknown as ConversationOverview[]) ?? [];
+
   return (
-    <AppProvider me={me}>
+    <AppProvider me={me} initialConversations={initialConversations}>
       <AppShell>{children}</AppShell>
     </AppProvider>
   );
