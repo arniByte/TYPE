@@ -101,54 +101,42 @@
     );
   }
 
-  /* Looping "typed out" wordmark for the menu logo. */
-  .tw-letter {
-    display: inline-block;
-    opacity: 0;
-    animation: tw-letter 4.6s ease-in-out infinite both;
+  /* Calligraphic wordmark that draws itself in, left to right. */
+  .tw-write-loop {
+    animation: tw-write-loop 5s ease-in-out infinite;
   }
-  .tw-letter-once {
-    display: inline-block;
-    opacity: 0;
-    animation: tw-letter-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  .tw-caret {
-    display: inline-block;
-    margin-left: 0.04em;
-    animation: tw-blink 0.85s step-end infinite;
+  .tw-write-once {
+    animation: tw-write-once 1.5s cubic-bezier(0.65, 0, 0.35, 1) both;
   }
 }
 
-@keyframes tw-letter-in {
+@keyframes tw-write-once {
   from {
-    opacity: 0;
-    transform: translateY(0.18em) scale(0.9);
+    clip-path: inset(0 100% 0 0);
   }
   to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    clip-path: inset(0 0 0 0);
   }
 }
-
-@keyframes tw-letter {
-  0%,
-  4% {
-    opacity: 0;
-    transform: translateY(0.14em) scale(0.92);
-  }
-  11%,
-  72% {
+@keyframes tw-write-loop {
+  0% {
+    clip-path: inset(0 100% 0 0);
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
-  80%,
+  30% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  82% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  92% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
   100% {
-    opacity: 0;
-    transform: translateY(0.05em);
-  }
-}
-@keyframes tw-blink {
-  50% {
+    clip-path: inset(0 100% 0 0);
     opacity: 0;
   }
 }

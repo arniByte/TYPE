@@ -33,6 +33,7 @@ const config: Config = {
           DEFAULT: '#CCFF00',
           bright: '#D7FF45',
           deep: '#5F7A00', // readable lime for TEXT on white/light
+          grass: '#4FA800', // brighter, fresher green for playful accents
           ink: '#1A1F00', // text/icon color placed ON a lime fill
         },
         danger: '#D6453C',

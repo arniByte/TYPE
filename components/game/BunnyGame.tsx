@@ -114,7 +114,7 @@ export function BunnyGame({ open, onClose }: { open: boolean; onClose: () => voi
       {/* Mascot + scoreboard */}
       <div className="flex items-center justify-between">
         <div className={cn('transition-transform duration-200', pop && 'scale-125')}>
-          <BunnyAscii sizeClass="text-base" aura={false} className="text-lime-deep" />
+          <BunnyAscii sizeClass="text-base" aura={false} className="text-lime-grass" />
         </div>
         <div className="flex items-center gap-4 text-right">
           <div>
@@ -125,7 +125,7 @@ export function BunnyGame({ open, onClose }: { open: boolean; onClose: () => voi
             <p className="flex items-center justify-end gap-1 text-[11px] font-medium uppercase tracking-wide text-faint">
               <Zap className="h-3 w-3" /> Combo
             </p>
-            <p className="text-2xl font-extrabold tabular-nums leading-none text-lime-deep">×{combo}</p>
+            <p className="text-2xl font-extrabold tabular-nums leading-none text-lime-grass">×{combo}</p>
           </div>
         </div>
       </div>
@@ -176,7 +176,7 @@ export function BunnyGame({ open, onClose }: { open: boolean; onClose: () => voi
                   key={i}
                   className={cn(
                     'px-[1px]',
-                    state === 'ok' && 'text-lime-deep',
+                    state === 'ok' && 'text-lime-grass',
                     state === 'bad' && 'text-danger',
                     state === 'cur' && 'rounded-sm bg-lime/30 text-fg',
                     state === 'idle' && 'text-faint',
@@ -211,7 +211,7 @@ export function BunnyGame({ open, onClose }: { open: boolean; onClose: () => voi
             <BunnyAscii sizeClass="text-2xl" className="mx-auto mb-3" />
           </div>
           <p className="text-sm text-muted">Time! You scored</p>
-          <p className="text-5xl font-extrabold tabular-nums text-lime-deep">{score}</p>
+          <p className="text-5xl font-extrabold tabular-nums text-lime-grass">{score}</p>
           <p className="mt-1 flex items-center justify-center gap-3 text-xs text-faint">
             <span className="inline-flex items-center gap-1">
               <Trophy className="h-3.5 w-3.5" /> Best {best}
@@ -221,7 +221,7 @@ export function BunnyGame({ open, onClose }: { open: boolean; onClose: () => voi
             </span>
           </p>
           {score >= best && score > 0 && (
-            <p className="mt-2 text-sm font-semibold text-lime-deep">New best! 🥕</p>
+            <p className="mt-2 text-sm font-semibold text-lime-grass">New best! 🥕</p>
           )}
           <div className="mt-6 flex justify-center gap-2">
             <Button onClick={start}>

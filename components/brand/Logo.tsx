@@ -14,9 +14,9 @@ type LogoProps = {
 };
 
 const WORD_SIZES = {
-  sm: 'text-xl',
-  md: 'text-2xl',
-  lg: 'text-4xl',
+  sm: 'text-2xl',
+  md: 'text-3xl',
+  lg: 'text-5xl',
 } as const;
 
 const MARK_SIZES = {
@@ -35,9 +35,7 @@ export function Logo({ variant = 'full', size = 'md', href = '/', animated = fal
         (animated ? (
           <TypeWordmark className={WORD_SIZES[size]} />
         ) : (
-          <span className={cn('font-extrabold tracking-tight leading-none text-fg', WORD_SIZES[size])}>
-            TYPE
-          </span>
+          <span className={cn('font-display leading-[1.15] text-fg', WORD_SIZES[size])}>TYPE</span>
         ))}
     </span>
   );
