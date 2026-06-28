@@ -34,10 +34,10 @@ Next.js 15 (App Router, React 19, TS strict) · Tailwind 3.4 · Supabase
   (`BunnyAscii`: float/aura/blink, optional `onClick`/`animated`). Used as the
   **logo mark** (tiny, static) and the **hero mascot** (large).
 - **Wordmark:** `components/brand/TypeWordmark.tsx` — "TYPE" in the **calligraphic
-  Pacifico** font (`--font-display`) that **draws itself in left-to-right**
+  Great Vibes** font (`--font-display`) that **draws itself in left-to-right**
   (clip-path reveal): `loop` (menu/sidebar) re-writes; `loop={false}` (hero/auth)
   writes once. Pure CSS, disabled under `prefers-reduced-motion`.
-- Fonts (next/font/google): **Inter** (UI), **JetBrains Mono** (bunny), **Pacifico** (wordmark).
+- Fonts (next/font/google): **Inter** (UI), **JetBrains Mono** (bunny), **Great Vibes** (wordmark).
 - Animations: `bunny-float`, `aura-pulse`, `slide-in-right` (mobile route enter),
   `slide-in-up`, `rec-pulse`, `tw-write-loop/once`.
 
