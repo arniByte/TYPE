@@ -6,12 +6,16 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Run on every path EXCEPT static assets and image files, so the session
-     * is refreshed on public pages too (not just /app) while keeping asset
-     * caching intact.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
-  ],
+  /*
+   * Only the routes that actually need an auth decision:
+   *  - /app/*   refresh the session + gate (unauthenticated → /login)
+   *  - /login, /signup   bounce already-authenticated users to /app
+   *
+   * Everything else (landing, /auth/callback, static assets) skips the
+   * middleware entirely. This matters: Edge middleware ignores the vercel.json
+   * region pin, so every invocation is a transpacific getUser() round-trip to
+   * Supabase (Seoul). Public pages don't need it — keeping them off the
+   * middleware makes the landing effectively static and instant.
+   */
+  matcher: ['/app/:path*', '/login', '/signup'],
 };

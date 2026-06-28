@@ -91,6 +91,7 @@ export function Composer({
   async function handleSend() {
     const text = value.trim();
     if (!text && files.length === 0) return;
+    navigator.vibrate?.(8); // subtle tactile tick on send
     setError(null);
     notifyStop();
 

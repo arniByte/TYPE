@@ -86,7 +86,7 @@ export function Sidebar() {
       </div>
 
       {/* List */}
-      <div className="no-scrollbar flex-1 overflow-y-auto px-2 pb-4">
+      <div className="no-scrollbar flex-1 overflow-y-auto overscroll-contain px-2 pb-4">
         {loadingConversations ? (
           <div className="pt-2">
             {Array.from({ length: 6 }).map((_, i) => (

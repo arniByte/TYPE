@@ -35,6 +35,7 @@ export function MessageBubble({
   replySnippet,
   seen,
   previewUrl,
+  animate,
   onReply,
 }: {
   message: ChatMessage;
@@ -46,6 +47,8 @@ export function MessageBubble({
   replySnippet?: ReplySnippet;
   seen?: boolean;
   previewUrl?: string | null;
+  /** Play the pop-in only for messages that arrive after first paint. */
+  animate?: boolean;
   onReply: (m: ChatMessage) => void;
 }) {
   const { supabase } = useApp();
@@ -79,8 +82,11 @@ export function MessageBubble({
     await supabase.rpc('delete_message', { _id: message.id });
   }
 
-  // Swipe-right-to-reply (touch / mobile).
+  // Swipe-to-reply (touch / mobile), directional like WhatsApp/Telegram:
+  // incoming messages swipe RIGHT (dir +1), your own swipe LEFT (dir -1).
   const canSwipe = !isDeleted && !message._pending;
+  const dir = isOwn ? -1 : 1;
+  const TRIGGER = 52;
   function onTouchStart(e: React.TouchEvent) {
     if (!canSwipe) return;
     const t = e.touches[0];
@@ -97,10 +103,17 @@ export function MessageBubble({
       setDragX(0);
       return;
     }
-    setDragX(dx > 8 ? Math.min(dx, 72) : 0);
+    // Only engage in the allowed direction; a wrong-way drag stays put. The
+    // result keeps `dir`'s sign so the bubble follows the finger and never
+    // slides off-screen.
+    const travel = Math.min(Math.max(dx * dir - 8, 0), 72);
+    setDragX(travel > 0 ? travel * dir : 0);
   }
   function onTouchEnd() {
-    if (drag.current.active && dragX > 52) onReply(message);
+    if (drag.current.active && Math.abs(dragX) > TRIGGER) {
+      navigator.vibrate?.(12);
+      onReply(message);
+    }
     drag.current.active = false;
     setDragX(0);
   }
@@ -117,11 +130,14 @@ export function MessageBubble({
       onTouchEnd={onTouchEnd}
       style={{ touchAction: 'pan-y' }}
     >
-      {/* Swipe-to-reply hint */}
-      {dragX > 4 && (
+      {/* Swipe-to-reply hint — surfaces on the side the bubble is dragged from. */}
+      {Math.abs(dragX) > 4 && (
         <span
-          className="pointer-events-none absolute left-1 top-1/2 -translate-y-1/2 text-lime-deep"
-          style={{ opacity: Math.min(dragX / 52, 1) }}
+          className={cn(
+            'pointer-events-none absolute top-1/2 -translate-y-1/2 text-lime-deep',
+            isOwn ? 'right-1' : 'left-1',
+          )}
+          style={{ opacity: Math.min(Math.abs(dragX) / TRIGGER, 1) }}
         >
           <Reply className="h-4 w-4" />
         </span>
@@ -149,7 +165,8 @@ export function MessageBubble({
 
         <div
           className={cn(
-            'relative rounded-2xl px-3 py-2 text-sm shadow-soft animate-bubble-in',
+            'relative rounded-2xl px-3 py-2 text-sm shadow-soft',
+            animate && 'animate-bubble-in',
             isOwn ? 'bg-lime text-lime-ink' : 'bg-elevated text-fg',
             isOwn ? 'rounded-br-md' : 'rounded-bl-md',
             isMedia && !isDeleted && 'p-1.5',
@@ -224,7 +241,7 @@ export function MessageBubble({
               className={cn(
                 'mt-0.5 flex items-center justify-end gap-1 text-[10px]',
                 isOwn ? 'text-lime-ink/75' : 'text-faint',
-                isMedia && message.content ? 'px-1.5 pb-0.5' : isMedia ? 'px-1.5 pb-0.5' : '',
+                isMedia && 'px-1.5 pb-0.5',
               )}
             >
               {message.edited_at && !isDeleted && <span>edited</span>}
