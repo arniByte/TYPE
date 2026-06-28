@@ -100,6 +100,57 @@
       rgba(204, 255, 0, 0) 70%
     );
   }
+
+  /* Looping "typed out" wordmark for the menu logo. */
+  .tw-letter {
+    display: inline-block;
+    opacity: 0;
+    animation: tw-letter 4.6s ease-in-out infinite both;
+  }
+  .tw-letter-once {
+    display: inline-block;
+    opacity: 0;
+    animation: tw-letter-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .tw-caret {
+    display: inline-block;
+    margin-left: 0.04em;
+    animation: tw-blink 0.85s step-end infinite;
+  }
+}
+
+@keyframes tw-letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.18em) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tw-letter {
+  0%,
+  4% {
+    opacity: 0;
+    transform: translateY(0.14em) scale(0.92);
+  }
+  11%,
+  72% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateY(0.05em);
+  }
+}
+@keyframes tw-blink {
+  50% {
+    opacity: 0;
+  }
 }
 
 /* ─────────────────────────────  Utilities  ──────────────────────────── */

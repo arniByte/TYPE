@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { BunnyAscii } from '@/components/brand/Bunny';
 import { Logo } from '@/components/brand/Logo';
+import { TypeWordmark } from '@/components/brand/TypeWordmark';
 
 export function AuthShell({
   title,
@@ -21,7 +22,7 @@ export function AuthShell({
         </div>
         <div className="relative flex flex-col items-start">
           <BunnyAscii sizeClass="text-2xl sm:text-3xl" className="mb-6" />
-          <h1 className="font-display text-7xl leading-tight text-fg">TYPE</h1>
+          <TypeWordmark loop={false} className="text-7xl" />
           <p className="mt-4 text-lg font-medium text-fg">
             where <span className="mark">words</span> matter
           </p>

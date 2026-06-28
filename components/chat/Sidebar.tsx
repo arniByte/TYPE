@@ -31,7 +31,7 @@ export function Sidebar() {
     <div className="flex h-full w-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 px-3 pt-4">
-        <Logo size="sm" href="/app" />
+        <Logo size="sm" href="/app" animated />
         <div className="flex items-center gap-1">
           <Link href="/app/contacts">
             <Button variant="ghost" size="icon" aria-label="Contacts">

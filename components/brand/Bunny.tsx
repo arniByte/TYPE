@@ -21,11 +21,15 @@ export function BunnyAscii({
   sizeClass = 'text-3xl sm:text-5xl',
   color = 'text-fg',
   aura = true,
+  animated = true,
+  onClick,
 }: {
   className?: string;
   sizeClass?: string;
   color?: string;
   aura?: boolean;
+  animated?: boolean;
+  onClick?: () => void;
 }) {
   const [blink, setBlink] = useState(false);
 
@@ -45,14 +49,30 @@ export function BunnyAscii({
     return () => clearTimeout(timer);
   }, []);
 
+  const interactive = !!onClick;
+
   return (
-    <div className={cn('relative inline-flex items-center justify-center', className)}>
+    <div
+      className={cn(
+        'group relative inline-flex items-center justify-center',
+        interactive && 'cursor-pointer',
+        className,
+      )}
+      onClick={onClick}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={interactive ? (e) => (e.key === 'Enter' || e.key === ' ') && onClick?.() : undefined}
+      aria-label={interactive ? 'Play the bunny mini-game' : undefined}
+      title={interactive ? 'Tap to play' : undefined}
+    >
       {aura && (
         <span className="pointer-events-none absolute inset-[-40%] aura animate-aura-pulse" aria-hidden />
       )}
       <pre
         className={cn(
-          'relative m-0 select-none font-mono font-bold leading-[1.15] tracking-tight animate-bunny-float',
+          'relative m-0 select-none font-mono font-bold leading-[1.15] tracking-tight transition-transform',
+          animated && 'animate-bunny-float',
+          interactive && 'group-hover:scale-110 group-active:scale-95',
           color,
           sizeClass,
         )}
